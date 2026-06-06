@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>חתולים</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;500;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0e0b14;
+      --bg-2: #1a1422;
+      --accent: #f6c177;
+      --text: #f4efe9;
+      --muted: #b3a8bd;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body { height: 100%; }
+
+    body {
+      font-family: "Heebo", system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, rgba(246, 193, 119, 0.12), transparent 60%),
+        linear-gradient(160deg, var(--bg) 0%, var(--bg-2) 100%);
+      color: var(--text);
+      min-height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    h1 {
+      font-weight: 800;
+      font-size: clamp(3rem, 12vw, 7rem);
+      letter-spacing: 0.02em;
+      line-height: 1;
+      background: linear-gradient(180deg, var(--text), var(--accent));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 2rem;
+      text-align: center;
+      filter: drop-shadow(0 6px 24px rgba(246, 193, 119, 0.18));
+    }
+
+    .carousel {
+      position: relative;
+      width: min(92vw, 560px);
+      aspect-ratio: 4 / 5;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow:
+        0 30px 60px -20px rgba(0, 0, 0, 0.7),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+      background: #000;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transform: scale(1.06);
+      transition: opacity 0.8s ease, transform 1.2s ease;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+
+    .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .slide .caption {
+      position: absolute;
+      inset: auto 0 0 0;
+      padding: 3.5rem 1.5rem 1.5rem;
+      background: linear-gradient(to top, rgba(8, 6, 12, 0.92), transparent);
+      text-align: center;
+    }
+
+    .caption .name {
+      font-weight: 800;
+      font-size: clamp(1.8rem, 7vw, 3rem);
+      color: var(--accent);
+      text-shadow: 0 2px 16px rgba(0, 0, 0, 0.6);
+    }
+
+    .nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(20, 16, 28, 0.55);
+      backdrop-filter: blur(8px);
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      transition: background 0.2s ease, transform 0.2s ease;
+      z-index: 2;
+    }
+
+    .nav:hover { background: rgba(246, 193, 119, 0.85); color: #1a1422; transform: translateY(-50%) scale(1.08); }
+    .nav.prev { right: 14px; }
+    .nav.next { left: 14px; }
+
+    .dots {
+      display: flex;
+      gap: 0.6rem;
+      margin-top: 1.6rem;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.25);
+      cursor: pointer;
+      transition: background 0.25s ease, transform 0.25s ease;
+    }
+
+    .dot.active { background: var(--accent); transform: scale(1.25); }
+
+    footer {
+      margin-top: 2rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+      font-weight: 300;
+    }
+  </style>
+</head>
+<body>
+  <h1>חתולים</h1>
+
+  <div class="carousel" id="carousel">
+    <button class="nav prev" id="prev" aria-label="הקודם">‹</button>
+    <button class="nav next" id="next" aria-label="הבא">›</button>
+  </div>
+
+  <div class="dots" id="dots"></div>
+
+  <footer>🐾</footer>
+
+  <script>
+    const cats = [
+      { file: "floki.jpeg", name: "פלוקי" },
+      { file: "filip.jpeg", name: "פיליפ" },
+      { file: "babet.jpeg", name: "בבט" },
+    ];
+
+    const carousel = document.getElementById("carousel");
+    const dotsWrap = document.getElementById("dots");
+    let index = 0;
+    let timer;
+
+    cats.forEach((cat, i) => {
+      const slide = document.createElement("div");
+      slide.className = "slide" + (i === 0 ? " active" : "");
+      slide.innerHTML = `
+        <img src="${cat.file}" alt="${cat.name}" loading="${i === 0 ? "eager" : "lazy"}" />
+        <div class="caption"><div class="name">${cat.name}</div></div>
+      `;
+      carousel.insertBefore(slide, carousel.firstChild);
+
+      const dot = document.createElement("button");
+      dot.className = "dot" + (i === 0 ? " active" : "");
+      dot.setAttribute("aria-label", cat.name);
+      dot.addEventListener("click", () => go(i));
+      dotsWrap.appendChild(dot);
+    });
+
+    const slides = document.querySelectorAll(".slide");
+    const dots = document.querySelectorAll(".dot");
+
+    function go(i) {
+      index = (i + cats.length) % cats.length;
+      slides.forEach((s, n) => s.classList.toggle("active", n === index));
+      dots.forEach((d, n) => d.classList.toggle("active", n === index));
+      restart();
+    }
+
+    function restart() {
+      clearInterval(timer);
+      timer = setInterval(() => go(index + 1), 4000);
+    }
+
+    document.getElementById("next").addEventListener("click", () => go(index + 1));
+    document.getElementById("prev").addEventListener("click", () => go(index - 1));
+
+    document.addEventListener("keydown", (e) => {
+      // RTL: arrow-left visually moves to next
+      if (e.key === "ArrowLeft") go(index + 1);
+      if (e.key === "ArrowRight") go(index - 1);
+    });
+
+    restart();
+  </script>
+</body>
+</html>
